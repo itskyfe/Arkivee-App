@@ -1,74 +1,40 @@
 import 'package:flutter/material.dart';
-import '../models/surat_model.dart';
-import '../models/page_header.dart';
+import 'package:get/get.dart';
+import '../controller/surat_control.dart';
 import '../models/card_surat.dart';
+import '../models/page_header.dart';
 import 'update_surat.dart';
 
-class ListSuratPage extends StatefulWidget {
-  final List<Surat> data;
-
-  const ListSuratPage(this.data, {super.key});
-
-  @override
-  State<ListSuratPage> createState() =>
-      _ListSuratPageState();
-}
-
-class _ListSuratPageState
-    extends State<ListSuratPage> {
-
-  bukaUpdate(int index) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            UpdateSuratPage(widget.data[index]),
-      ),
-    );
-
-    /// refresh UI setelah update
-    setState(() {});
-  }
+class ListSuratPage extends StatelessWidget {
+  const ListSuratPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<SuratController>();
+
     return Scaffold(
-// App Bar
-      appBar: AppBar(
-        title: Text('Arkivee', 
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          backgroundColor: Colors.blue
-        ),),
-      ),
-// Body
       body: Column(
         children: [
-          const PageHeader(title: "List Surat"),
-
+          const PageHeader(title: "Your Letter"),
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: widget.data.length,
-              itemBuilder: (context, index) {
-                return SuratCard(
-                  surat: widget.data[index],
-
-                  /// ✅ TAP = UPDATE
-                  onTap: () => bukaUpdate(index),
-
-                  /// ✅ DELETE
-                  onDelete: () {
-                    setState(() {
-                      widget.data.removeAt(index);
-                    });
-                  },
-                );
-              },
-            ),
-          )
+            child: Obx(() => controller.dataSurat.isEmpty
+                ? const Center(
+                    child: Text("Belum ada surat.",
+                        style: TextStyle(color: Colors.grey)),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: controller.dataSurat.length,
+                    itemBuilder: (context, i) {
+                      final surat = controller.dataSurat[i];
+                      return SuratCard(
+                        surat: surat,
+                        onTap: () => Get.to(() => UpdateSuratPage(surat)),
+                        onDelete: () => controller.hapus(surat),
+                      );
+                    },
+                  )),
+          ),
         ],
       ),
     );

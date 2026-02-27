@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../controller/surat_control.dart';
 import '../models/surat_model.dart';
 import '../models/page_header.dart';
 
@@ -6,67 +8,76 @@ class CreateSuratPage extends StatefulWidget {
   const CreateSuratPage({super.key});
 
   @override
-  State<CreateSuratPage> createState() =>
-      _CreateSuratPageState();
+  State<CreateSuratPage> createState() => _CreateSuratPageState();
 }
 
-class _CreateSuratPageState
-    extends State<CreateSuratPage> {
+class _CreateSuratPageState extends State<CreateSuratPage> {
+  final controller = Get.find<SuratController>();
+
   final nomor = TextEditingController();
   final perihal = TextEditingController();
   final tanggal = TextEditingController();
   final asalTujuan = TextEditingController();
-
   String kategori = "Masuk";
 
-  Widget input(
-    String title,
-    String placeholder,
-    TextEditingController controller,
-  ) {
+  // buka kalender dan isi field tanggal
+  Future<void> pilihTanggal() async {
+    final hasil = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (hasil != null) {
+      tanggal.text =
+          "${hasil.day.toString().padLeft(2, '0')}/${hasil.month.toString().padLeft(2, '0')}/${hasil.year}";
+    }
+  }
+
+  Widget labelField(String label, Widget field) {
     return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            style: const TextStyle(
-                fontWeight:
-                    FontWeight.bold)),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        Card(
-          child: Padding(
-            padding:
-                const EdgeInsets.all(12),
-            child: TextField(
-              controller: controller,
-              decoration:
-                  InputDecoration(
-                hintText: placeholder,
-                border:
-                    InputBorder.none,
-              ),
-            ),
-          ),
-        ),
+        field,
         const SizedBox(height: 12),
       ],
     );
   }
 
-  bool validasi() {
+  Widget inputField(TextEditingController ctrl, String hint) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: TextField(
+          controller: ctrl,
+          decoration: InputDecoration(hintText: hint, border: InputBorder.none),
+        ),
+      ),
+    );
+  }
+
+  void simpan() {
     if (nomor.text.isEmpty ||
         perihal.text.isEmpty ||
         tanggal.text.isEmpty ||
         asalTujuan.text.isEmpty) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        const SnackBar(
-            content: Text(
-                "Semua field wajib diisi")),
-      );
-      return false;
+      Get.snackbar("Gagal", "Semua field wajib diisi",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
     }
-    return true;
+
+    controller.tambah(Surat(
+      nomor: nomor.text,
+      perihal: perihal.text,
+      tanggal: tanggal.text,
+      asalTujuan: asalTujuan.text,
+      kategori: kategori,
+    ));
+
+    Get.back();
   }
 
   @override
@@ -74,84 +85,88 @@ class _CreateSuratPageState
     return Scaffold(
       body: Column(
         children: [
-          const PageHeader(
-              title: "Tambah Surat"),
+          const PageHeader(title: "Create A Letter"),
           Expanded(
-            child: Padding(
-              padding:
-                  const EdgeInsets.all(16),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  input("Nomor Surat",
-                      "Isi nomor surat",
-                      nomor),
-                  input("Perihal",
-                      "Isi perihal",
-                      perihal),
-                  input("Tanggal",
-                      "dd/mm/yyyy",
-                      tanggal),
-                  input(
-                      "Asal / Tujuan",
-                      "Isi asal atau tujuan",
-                      asalTujuan),
+                  labelField("Nomor Surat", inputField(nomor, "Masukkan nomor surat")),
+                  labelField("Perihal", inputField(perihal, "Masukkan perihal")),
 
-                  Card(
-                    child: DropdownButton(
-                      value: kategori,
-                      isExpanded: true,
-                      underline:
-                          const SizedBox(),
-                      items: [
-                        "Masuk",
-                        "Keluar"
-                      ]
-                          .map((e) =>
-                              DropdownMenuItem(
-                                value: e,
-                                child:
-                                    Text(e),
-                              ))
-                          .toList(),
-                      onChanged: (v) =>
-                          setState(() =>
-                              kategori = v!),
+                  // field tanggal dengan tombol kalender
+                  labelField(
+                    "Tanggal Surat",
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: tanggal,
+                                readOnly: true,
+                                decoration: const InputDecoration(
+                                  hintText: "dd/mm/yyyy",
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.calendar_today,
+                                  color: Colors.blue),
+                              onPressed: pilihTanggal,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
 
-                  const SizedBox(
-                      height: 20),
+                  labelField("Asal / Tujuan", inputField(asalTujuan, "Masukkan asal atau tujuan")),
 
-                  ElevatedButton(
-                    onPressed: () {
-                      if (!validasi())
-                        return;
-
-                      Navigator.pop(
-                        context,
-                        Surat(
-                          nomor:
-                              nomor.text,
-                          perihal:
-                              perihal.text,
-                          tanggal:
-                              tanggal.text,
-                          kategori:
-                              kategori,
-                          asalTujuan:
-                              asalTujuan
-                                  .text,
+                  // dropdown kategori
+                  labelField(
+                    "Kategori Surat",
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: DropdownButton<String>(
+                          value: kategori,
+                          isExpanded: true,
+                          underline: const SizedBox(),
+                          items: ["Masuk", "Keluar"]
+                              .map((e) =>
+                                  DropdownMenuItem(value: e, child: Text(e)))
+                              .toList(),
+                          onChanged: (v) => setState(() => kategori = v!),
                         ),
-                      );
-                    },
-                    child:
-                        const Text(
-                            "Simpan"),
-                  )
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      onPressed: simpan,
+                      child: const Text("Simpan", style: TextStyle(fontSize: 16)),
+                    ),
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
