@@ -1,3 +1,4 @@
-# Aplikasi-Manajemen-Penyimpanan-Surat
+# Arkivee
+*Aplikasi Manajemen Penyimpanan Surat*
 
-# arkivee_app
+Muhammad Rizky Febrianto | 2409116045
