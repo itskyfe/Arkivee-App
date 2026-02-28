@@ -69,6 +69,12 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
       return;
     }
 
+    if (controller.nomorSudahAda(nomor.text)) {
+      Get.snackbar("Gagal", "Nomor surat sudah digunakan",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
     controller.tambah(Surat(
       nomor: nomor.text,
       perihal: perihal.text,

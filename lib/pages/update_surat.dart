@@ -81,6 +81,12 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
       return;
     }
 
+    if (controller.nomorSudahAda(nomor.text, kecuali: widget.surat)) {
+      Get.snackbar("Gagal", "Nomor surat sudah digunakan",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
     controller.updateSurat(
       widget.surat,
       nomor.text,

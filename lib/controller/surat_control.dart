@@ -2,8 +2,13 @@ import 'package:get/get.dart';
 import '../models/surat_model.dart';
 
 class SuratController extends GetxController {
-  // RxList = List yang bisa dipantau perubahannya oleh GetX
   var dataSurat = <Surat>[].obs;
+
+  // cek apakah nomor surat sudah dipakai
+  // parameter "kecuali" dipakai saat update, supaya nomor surat miliknya sendiri tidak dianggap duplikat
+  bool nomorSudahAda(String nomor, {Surat? kecuali}) {
+    return dataSurat.any((s) => s.nomor == nomor && s != kecuali);
+  }
 
   void tambah(Surat surat) {
     dataSurat.add(surat);
@@ -20,7 +25,7 @@ class SuratController extends GetxController {
     surat.tanggal = tanggal;
     surat.asalTujuan = asalTujuan;
     surat.kategori = kategori;
-    dataSurat.refresh(); // beritahu GetX ada perubahan
+    dataSurat.refresh();
   }
 
   int get totalMasuk => dataSurat.where((s) => s.kategori == "Masuk").length;
