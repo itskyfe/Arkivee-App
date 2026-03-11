@@ -5,10 +5,72 @@ import '../models/card_surat.dart';
 import '../models/page_header.dart';
 import 'update_surat.dart';
 
-class ListSuratPage extends StatelessWidget {
+class ListSuratPage extends StatefulWidget {
   const ListSuratPage({super.key});
 
-  void konfirmasiDelete(controller, surat) {
+  @override
+  State<ListSuratPage> createState() => _ListSuratPageState();
+}
+
+class _ListSuratPageState extends State<ListSuratPage> {
+
+  final controller = Get.find<SuratController>();
+
+  String filterKategori = "Semua";
+  String sortTanggal = "Terbaru";
+  String searchText = "";
+
+  List getFilteredList() {
+
+    List list = controller.dataSurat.toList();
+
+    /// SEARCH
+    if (searchText.isNotEmpty) {
+      list = list.where((s) =>
+          s.nomor.toLowerCase().contains(searchText.toLowerCase()) ||
+          s.perihal.toLowerCase().contains(searchText.toLowerCase())
+      ).toList();
+    }
+
+    /// FILTER
+    if (filterKategori == "Masuk") {
+      list = list.where((s) => s.kategori == "Masuk").toList();
+    }
+
+    if (filterKategori == "Keluar") {
+      list = list.where((s) => s.kategori == "Keluar").toList();
+    }
+
+    /// SORT
+    list.sort((a, b) {
+
+      DateTime tanggalA = _parseTanggal(a.tanggal);
+      DateTime tanggalB = _parseTanggal(b.tanggal);
+
+      if (sortTanggal == "Terbaru") {
+        return tanggalB.compareTo(tanggalA);
+      } else {
+        return tanggalA.compareTo(tanggalB);
+      }
+
+    });
+
+    return list;
+  }
+
+  DateTime _parseTanggal(String tanggal) {
+
+    List parts = tanggal.split("/");
+
+    return DateTime(
+      int.parse(parts[2]),
+      int.parse(parts[1]),
+      int.parse(parts[0]),
+    );
+  }
+
+  void konfirmasiDelete(surat) {
+
     Get.defaultDialog(
       title: "Hapus Surat",
       middleText: "Apakah yakin ingin menghapus surat ini?",
@@ -26,49 +88,155 @@ class ListSuratPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final controller = Get.find<SuratController>();
-
     return Scaffold(
+
       body: Column(
         children: [
 
           const PageHeader(title: "All Letters"),
 
-          Expanded(
-            child: Obx(() {
+          Padding(
+            padding: const EdgeInsets.all(16),
 
-              if (controller.dataSurat.isEmpty) {
-                return const Center(
-                  child: Text("Belum ada surat"),
-                );
-              }
+            child: Column(
+              children: [
 
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: controller.dataSurat.length,
-                itemBuilder: (context, i) {
+                /// SEARCH
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: "Cari nomor atau perihal surat...",
+                    prefixIcon: const Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
 
-                  final surat = controller.dataSurat[i];
+                  onChanged: (value) {
+                    setState(() {
+                      searchText = value;
+                    });
+                  },
+                ),
 
-                  return SuratCard(
-                    surat: surat,
+                const SizedBox(height: 12),
 
-                    onEdit: () {
-                      Get.to(() => UpdateSuratPage(surat));
-                    },
+                /// FILTER + SORT
+                Row(
+                  children: [
 
-                    onDelete: () {
-                      konfirmasiDelete(controller, surat);
-                    },
+                    Expanded(
+                      child: DropdownButtonFormField(
 
-                    onTap: () {
-                      Get.to(() => UpdateSuratPage(surat));
+                        value: filterKategori,
+
+                        items: const [
+                          DropdownMenuItem(
+                            value: "Semua",
+                            child: Text("Semua Surat"),
+                          ),
+                          DropdownMenuItem(
+                            value: "Masuk",
+                            child: Text("Surat Masuk"),
+                          ),
+                          DropdownMenuItem(
+                            value: "Keluar",
+                            child: Text("Surat Keluar"),
+                          ),
+                        ],
+
+                        onChanged: (value) {
+                          setState(() {
+                            filterKategori = value!;
+                          });
+                        },
+
+                        decoration: const InputDecoration(
+                          labelText: "Filter",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 10),
+
+                    Expanded(
+                      child: DropdownButtonFormField(
+
+                        value: sortTanggal,
+
+                        items: const [
+                          DropdownMenuItem(
+                            value: "Terbaru",
+                            child: Text("Terbaru"),
+                          ),
+                          DropdownMenuItem(
+                            value: "Terlama",
+                            child: Text("Terlama"),
+                          ),
+                        ],
+
+                        onChanged: (value) {
+                          setState(() {
+                            sortTanggal = value!;
+                          });
+                        },
+
+                        decoration: const InputDecoration(
+                          labelText: "Urutkan",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 20),
+
+                /// LIST SURAT
+                Obx(() {
+
+                  List list = getFilteredList();
+
+                  if (list.isEmpty) {
+                    return const Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Text("Tidak ada surat ditemukan"),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: list.length,
+
+                    itemBuilder: (context, i) {
+
+                      final surat = list[i];
+
+                      return SuratCard(
+
+                        surat: surat,
+
+                        onEdit: () {
+                          Get.to(() => UpdateSuratPage(surat));
+                        },
+
+                        onDelete: () {
+                          konfirmasiDelete(surat);
+                        },
+
+                        onTap: () {
+                          Get.to(() => UpdateSuratPage(surat));
+                        },
+                      );
                     },
                   );
-                },
-              );
-            }),
-          ),
+                })
+              ],
+            ),
+          )
         ],
       ),
     );

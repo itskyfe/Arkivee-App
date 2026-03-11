@@ -120,7 +120,7 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField(
-                      value: kategori,
+                      initialValue: kategori,
                       items: ["Masuk", "Keluar"]
                           .map((e) => DropdownMenuItem(
                                 value: e,

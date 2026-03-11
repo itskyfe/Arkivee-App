@@ -136,12 +136,6 @@ class HomePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
 
-                        Icon(
-                          Icons.mail_outline,
-                          size: 80,
-                          color: Colors.grey,
-                        ),
-
                         SizedBox(height: 16),
 
                         Text(
