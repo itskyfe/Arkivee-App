@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controller/surat_control.dart';
-import '../models/surat_model.dart';
-import '../models/page_header.dart';
+
+import '../../controllers/surat_controller.dart';
+import '../../models/surat_model.dart';
+import '../../widgets/page_header.dart';
 
 class UpdateSuratPage extends StatefulWidget {
   final Surat surat;
@@ -14,7 +15,6 @@ class UpdateSuratPage extends StatefulWidget {
 }
 
 class _UpdateSuratPageState extends State<UpdateSuratPage> {
-
   final controller = Get.find<SuratController>();
 
   final formKey = GlobalKey<FormState>();
@@ -32,44 +32,47 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
 
     nomor = TextEditingController(text: widget.surat.nomor);
     perihal = TextEditingController(text: widget.surat.perihal);
-    tanggal = TextEditingController(text: widget.surat.tanggal);
+    tanggal = TextEditingController(
+      text:
+          "${widget.surat.tanggal.day}/${widget.surat.tanggal.month}/${widget.surat.tanggal.year}",
+    );
     asalTujuan = TextEditingController(text: widget.surat.asalTujuan);
 
     kategori = widget.surat.kategori;
   }
 
   Future<void> pilihTanggal() async {
-
     final hasil = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: widget.surat.tanggal,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
 
     if (hasil != null) {
-      tanggal.text = "${hasil.day}/${hasil.month}/${hasil.year}";
+      setState(() {
+        tanggal.text = "${hasil.day}/${hasil.month}/${hasil.year}";
+        widget.surat.tanggal = hasil;
+      });
     }
   }
 
   Widget inputField(TextEditingController ctrl, String label) {
-
     return TextFormField(
       controller: ctrl,
+
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
 
       validator: (value) {
-
         if (value == null || value.isEmpty) {
           return "$label wajib diisi";
         }
 
-        /// VALIDASI NOMOR SURAT DUPLIKAT
+        /// VALIDASI DUPLIKAT NOMOR SURAT
         if (label == "Nomor Surat") {
           if (controller.nomorSudahAda(value, kecuali: widget.surat)) {
             return "Nomor surat sudah digunakan";
@@ -82,29 +85,45 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
   }
 
   void simpan() {
+    if (!formKey.currentState!.validate()) return;
 
-    if (formKey.currentState!.validate()) {
+    Get.defaultDialog(
+      title: "Simpan Surat",
 
-      controller.updateSurat(
-        widget.surat,
-        nomor.text,
-        perihal.text,
-        tanggal.text,
-        asalTujuan.text,
-        kategori,
-      );
+      middleText: "Apakah data surat sudah benar?",
 
-      Get.back();
-    }
+      textCancel: "Batal",
+
+      textConfirm: "Simpan",
+
+      confirmTextColor: Colors.white,
+
+      buttonColor: Colors.blue,
+
+      onConfirm: () {
+        controller.tambah(
+          Surat(
+            nomor: nomor.text,
+            perihal: perihal.text,
+            tanggal: DateTime.now(),
+            asalTujuan: asalTujuan.text,
+            kategori: kategori,
+          ),
+        );
+
+        Get.back();
+        Get.back();
+
+        Get.snackbar("Berhasil", "Surat berhasil ditambahkan");
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Column(
         children: [
-
           const PageHeader(title: "Update A Letter"),
 
           Expanded(
@@ -116,7 +135,6 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
 
                 child: Column(
                   children: [
-
                     inputField(nomor, "Nomor Surat"),
                     const SizedBox(height: 12),
 
@@ -126,11 +144,14 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
                     TextFormField(
                       controller: tanggal,
                       readOnly: true,
+
                       decoration: InputDecoration(
                         labelText: "Tanggal",
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
+
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.calendar_today),
                           onPressed: pilihTanggal,
@@ -141,6 +162,7 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
                         if (value == null || value.isEmpty) {
                           return "Tanggal wajib diisi";
                         }
+
                         return null;
                       },
                     ),
@@ -151,20 +173,23 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
                     const SizedBox(height: 12),
 
                     DropdownButtonFormField(
-                      initialValue: kategori,
+                      value: kategori,
+
                       items: ["Masuk", "Keluar"]
-                          .map((e) => DropdownMenuItem(
-                                value: e,
-                                child: Text(e),
-                              ))
+                          .map(
+                            (e) => DropdownMenuItem(value: e, child: Text(e)),
+                          )
                           .toList(),
+
                       onChanged: (v) {
                         setState(() {
                           kategori = v!;
                         });
                       },
+
                       decoration: InputDecoration(
                         labelText: "Kategori",
+
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -175,12 +200,14 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
 
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
 
+                      child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
+
                           padding: const EdgeInsets.symmetric(vertical: 14),
+
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -190,18 +217,19 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
 
                         child: const Text(
                           "Simpan",
+
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

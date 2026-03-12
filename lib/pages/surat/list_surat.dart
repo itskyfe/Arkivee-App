@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controller/surat_control.dart';
-import '../models/card_surat.dart';
-import '../models/page_header.dart';
+
+import '../../controllers/surat_controller.dart';
+import '../../widgets/card_surat.dart';
+import '../../widgets/page_header.dart';
 import 'update_surat.dart';
 
 class ListSuratPage extends StatefulWidget {
+
   const ListSuratPage({super.key});
 
   @override
@@ -26,31 +28,41 @@ class _ListSuratPageState extends State<ListSuratPage> {
 
     /// SEARCH
     if (searchText.isNotEmpty) {
+
       list = list.where((s) =>
+
           s.nomor.toLowerCase().contains(searchText.toLowerCase()) ||
+
           s.perihal.toLowerCase().contains(searchText.toLowerCase())
+
       ).toList();
+
     }
 
     /// FILTER
     if (filterKategori == "Masuk") {
+
       list = list.where((s) => s.kategori == "Masuk").toList();
+
     }
 
     if (filterKategori == "Keluar") {
+
       list = list.where((s) => s.kategori == "Keluar").toList();
+
     }
 
     /// SORT
     list.sort((a, b) {
 
-      DateTime tanggalA = _parseTanggal(a.tanggal);
-      DateTime tanggalB = _parseTanggal(b.tanggal);
-
       if (sortTanggal == "Terbaru") {
-        return tanggalB.compareTo(tanggalA);
+
+        return b.tanggal.compareTo(a.tanggal);
+
       } else {
-        return tanggalA.compareTo(tanggalB);
+
+        return a.tanggal.compareTo(b.tanggal);
+
       }
 
     });
@@ -58,29 +70,28 @@ class _ListSuratPageState extends State<ListSuratPage> {
     return list;
   }
 
-  DateTime _parseTanggal(String tanggal) {
-
-    List parts = tanggal.split("/");
-
-    return DateTime(
-      int.parse(parts[2]),
-      int.parse(parts[1]),
-      int.parse(parts[0]),
-    );
-  }
-
   void konfirmasiDelete(surat) {
 
     Get.defaultDialog(
+
       title: "Hapus Surat",
+
       middleText: "Apakah yakin ingin menghapus surat ini?",
+
       textCancel: "Batal",
+
       textConfirm: "Hapus",
+
       confirmTextColor: Colors.white,
+
       buttonColor: Colors.red,
+
       onConfirm: () {
+
         controller.hapus(surat);
+
         Get.back();
+
       },
     );
   }
@@ -91,30 +102,42 @@ class _ListSuratPageState extends State<ListSuratPage> {
     return Scaffold(
 
       body: Column(
+
         children: [
 
           const PageHeader(title: "All Letters"),
 
           Padding(
+
             padding: const EdgeInsets.all(16),
 
             child: Column(
+
               children: [
 
                 /// SEARCH
                 TextField(
+
                   decoration: InputDecoration(
+
                     hintText: "Cari nomor atau perihal surat...",
+
                     prefixIcon: const Icon(Icons.search),
+
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
+
                   ),
 
                   onChanged: (value) {
+
                     setState(() {
+
                       searchText = value;
+
                     });
+
                   },
                 ),
 
@@ -122,37 +145,50 @@ class _ListSuratPageState extends State<ListSuratPage> {
 
                 /// FILTER + SORT
                 Row(
+
                   children: [
 
                     Expanded(
+
                       child: DropdownButtonFormField(
 
                         value: filterKategori,
 
                         items: const [
+
                           DropdownMenuItem(
                             value: "Semua",
                             child: Text("Semua Surat"),
                           ),
+
                           DropdownMenuItem(
                             value: "Masuk",
                             child: Text("Surat Masuk"),
                           ),
+
                           DropdownMenuItem(
                             value: "Keluar",
                             child: Text("Surat Keluar"),
                           ),
+
                         ],
 
                         onChanged: (value) {
+
                           setState(() {
+
                             filterKategori = value!;
+
                           });
+
                         },
 
                         decoration: const InputDecoration(
+
                           labelText: "Filter",
+
                           border: OutlineInputBorder(),
+
                         ),
                       ),
                     ),
@@ -160,33 +196,45 @@ class _ListSuratPageState extends State<ListSuratPage> {
                     const SizedBox(width: 10),
 
                     Expanded(
+
                       child: DropdownButtonFormField(
 
                         value: sortTanggal,
 
                         items: const [
+
                           DropdownMenuItem(
                             value: "Terbaru",
                             child: Text("Terbaru"),
                           ),
+
                           DropdownMenuItem(
                             value: "Terlama",
                             child: Text("Terlama"),
                           ),
+
                         ],
 
                         onChanged: (value) {
+
                           setState(() {
+
                             sortTanggal = value!;
+
                           });
+
                         },
 
                         decoration: const InputDecoration(
+
                           labelText: "Urutkan",
+
                           border: OutlineInputBorder(),
+
                         ),
                       ),
                     ),
+
                   ],
                 ),
 
@@ -198,17 +246,25 @@ class _ListSuratPageState extends State<ListSuratPage> {
                   List list = getFilteredList();
 
                   if (list.isEmpty) {
+
                     return const Center(
+
                       child: Padding(
+
                         padding: EdgeInsets.only(top: 40),
+
                         child: Text("Tidak ada surat ditemukan"),
+
                       ),
                     );
                   }
 
                   return ListView.builder(
+
                     shrinkWrap: true,
+
                     physics: const NeverScrollableScrollPhysics(),
+
                     itemCount: list.length,
 
                     itemBuilder: (context, i) {
@@ -220,20 +276,22 @@ class _ListSuratPageState extends State<ListSuratPage> {
                         surat: surat,
 
                         onEdit: () {
+
                           Get.to(() => UpdateSuratPage(surat));
+
                         },
 
                         onDelete: () {
+
                           konfirmasiDelete(surat);
+
                         },
 
-                        onTap: () {
-                          Get.to(() => UpdateSuratPage(surat));
-                        },
                       );
                     },
                   );
                 })
+
               ],
             ),
           )
