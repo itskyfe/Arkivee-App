@@ -1,5 +1,4 @@
 class Surat {
-
   String? id;
   String nomor;
   String perihal;
@@ -18,35 +17,26 @@ class Surat {
     this.userId,
   });
 
-  factory Surat.fromJson(Map<String,dynamic> json){
-
+  factory Surat.fromJson(Map<String, dynamic> json) {
     return Surat(
-
       id: json["id"],
       nomor: json["nomor_surat"],
       perihal: json["perihal"],
       tanggal: DateTime.parse(json["tanggal"]),
       asalTujuan: json["asal_tujuan"],
       kategori: json["kategori"],
-      userId: json["user_id"]
-
+      userId: json["user_id"],
     );
-
   }
 
-  Map<String,dynamic> toJson(){
-
+  Map<String, dynamic> toJson() {
     return {
-
       "nomor_surat": nomor,
       "perihal": perihal,
       "tanggal": tanggal.toIso8601String(),
       "asal_tujuan": asalTujuan,
       "kategori": kategori,
-      "user_id": userId
-
+      "user_id": userId,
     };
-
   }
-
 }

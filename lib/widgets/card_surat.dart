@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../models/surat_model.dart';
 
 class SuratCard extends StatelessWidget {
-
   final Surat surat;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -16,173 +15,131 @@ class SuratCard extends StatelessWidget {
     this.onTap,
   });
 
-  Color kategoriColor(){
-
-    if(surat.kategori=="Masuk"){
+  Color kategoriColor() {
+    if (surat.kategori == "Masuk") {
       return Colors.green;
-    }else{
+    } else {
       return Colors.orange;
     }
-
   }
 
   @override
-  Widget build(BuildContext context){
-
+  Widget build(BuildContext context) {
     return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8),
 
-      elevation:2,
-      margin: const EdgeInsets.symmetric(vertical:8),
-
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
 
       child: InkWell(
-
-        onTap:onTap,
+        onTap: onTap,
 
         borderRadius: BorderRadius.circular(12),
 
         child: Padding(
-
           padding: const EdgeInsets.all(12),
 
           child: Row(
-
-            children:[
-
+            children: [
               Container(
-
-                width:50,
-                height:50,
+                width: 50,
+                height: 50,
 
                 decoration: BoxDecoration(
                   color: Colors.blue.shade100,
                   borderRadius: BorderRadius.circular(10),
                 ),
 
-                child: const Icon(
-                  Icons.mail,
-                  color: Colors.blue,
-                ),
-
+                child: const Icon(Icons.mail, color: Colors.blue),
               ),
 
-              const SizedBox(width:12),
+              const SizedBox(width: 12),
 
               Expanded(
-
                 child: Column(
-
                   crossAxisAlignment: CrossAxisAlignment.start,
 
-                  children:[
-
+                  children: [
                     Text(
                       surat.perihal,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize:15,
+                        fontSize: 15,
                       ),
                     ),
 
-                    const SizedBox(height:4),
+                    const SizedBox(height: 4),
 
                     Text(
                       surat.nomor,
-                      style: const TextStyle(color:Colors.grey),
+                      style: const TextStyle(color: Colors.grey),
                     ),
 
-                    const SizedBox(height:4),
+                    const SizedBox(height: 4),
 
                     Text(
                       surat.asalTujuan,
-                      style: const TextStyle(fontSize:12),
+                      style: const TextStyle(fontSize: 12),
                     ),
 
-                    const SizedBox(height:6),
+                    const SizedBox(height: 6),
 
                     Row(
-
-                      children:[
-
+                      children: [
                         Container(
-
                           padding: const EdgeInsets.symmetric(
-                            horizontal:8,
-                            vertical:3,
+                            horizontal: 8,
+                            vertical: 3,
                           ),
 
                           decoration: BoxDecoration(
-                            color:kategoriColor(),
+                            color: kategoriColor(),
                             borderRadius: BorderRadius.circular(6),
                           ),
 
                           child: Text(
-
                             surat.kategori,
 
                             style: const TextStyle(
-                              color:Colors.white,
-                              fontSize:11,
+                              color: Colors.white,
+                              fontSize: 11,
                             ),
-
                           ),
-
                         ),
 
-                        const SizedBox(width:10),
+                        const SizedBox(width: 10),
 
                         Text(
-
                           "${surat.tanggal.day}/${surat.tanggal.month}/${surat.tanggal.year}",
 
                           style: const TextStyle(
-                            fontSize:11,
-                            color:Colors.grey,
+                            fontSize: 11,
+                            color: Colors.grey,
                           ),
-
                         ),
-
                       ],
-
-                    )
-
+                    ),
                   ],
-
                 ),
-
               ),
 
               Column(
-
-                children:[
-
+                children: [
                   IconButton(
-                    icon: const Icon(Icons.edit,color:Colors.blue),
-                    onPressed:onEdit,
+                    icon: const Icon(Icons.edit, color: Colors.blue),
+                    onPressed: onEdit,
                   ),
 
                   IconButton(
-                    icon: const Icon(Icons.delete,color:Colors.red),
-                    onPressed:onDelete,
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: onDelete,
                   ),
-
                 ],
-
-              )
-
+              ),
             ],
-
           ),
-
         ),
-
       ),
-
     );
-
   }
-
 }

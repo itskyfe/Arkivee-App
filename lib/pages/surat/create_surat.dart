@@ -24,6 +24,9 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
 
   String kategori = "Masuk";
 
+  /// VARIABEL TANGGAL ASLI
+  DateTime? selectedTanggal;
+
   Future pilihTanggal() async {
     final hasil = await showDatePicker(
       context: context,
@@ -33,20 +36,21 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
     );
 
     if (hasil != null) {
-      tanggal.text = "${hasil.day}/${hasil.month}/${hasil.year}";
+      setState(() {
+        selectedTanggal = hasil;
+
+        tanggal.text = "${hasil.day}/${hasil.month}/${hasil.year}";
+      });
     }
   }
 
   Widget inputField(TextEditingController ctrl, String label) {
     return TextFormField(
       controller: ctrl,
-
       decoration: InputDecoration(
         labelText: label,
-
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
       ),
-
       validator: (value) {
         if (value == null || value.isEmpty) {
           return "$label wajib diisi";
@@ -67,17 +71,35 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
   void simpan() {
     if (!formKey.currentState!.validate()) return;
 
+    /// VALIDASI TANGGAL
+    if (selectedTanggal == null) {
+      Get.snackbar(
+        "Error",
+        "Tanggal wajib dipilih",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     controller.tambah(
       Surat(
         nomor: nomor.text,
         perihal: perihal.text,
-        tanggal: DateTime.now(),
+        tanggal: selectedTanggal!, // sekarang pakai tanggal yang dipilih
         asalTujuan: asal.text,
         kategori: kategori,
       ),
     );
 
     Get.back();
+
+    Get.snackbar(
+      "Berhasil",
+      "Surat berhasil ditambahkan",
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+    );
   }
 
   @override
@@ -121,10 +143,9 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
                       ),
 
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Tanggal wajib diisi";
+                        if (selectedTanggal == null) {
+                          return "Tanggal wajib dipilih";
                         }
-
                         return null;
                       },
                     ),

@@ -89,32 +89,34 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
 
     Get.defaultDialog(
       title: "Simpan Surat",
-
       middleText: "Apakah data surat sudah benar?",
-
       textCancel: "Batal",
-
       textConfirm: "Simpan",
-
       confirmTextColor: Colors.white,
-
       buttonColor: Colors.blue,
 
       onConfirm: () {
-        controller.tambah(
+        controller.updateSurat(
           Surat(
+            id: widget.surat.id, // penting agar update bukan insert
             nomor: nomor.text,
             perihal: perihal.text,
-            tanggal: DateTime.now(),
+            tanggal: widget.surat.tanggal,
             asalTujuan: asalTujuan.text,
             kategori: kategori,
+            userId: widget.surat.userId,
           ),
         );
 
         Get.back();
         Get.back();
 
-        Get.snackbar("Berhasil", "Surat berhasil ditambahkan");
+        Get.snackbar(
+          "Berhasil",
+          "Surat berhasil diperbarui",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
       },
     );
   }

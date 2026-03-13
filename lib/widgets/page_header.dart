@@ -16,9 +16,7 @@ class PageHeader extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(8, 8, 16, 24),
           decoration: const BoxDecoration(
             color: Colors.blue,
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(30),
-            ),
+            borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
