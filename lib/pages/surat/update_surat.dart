@@ -98,7 +98,7 @@ class _UpdateSuratPageState extends State<UpdateSuratPage> {
       onConfirm: () {
         controller.updateSurat(
           Surat(
-            id: widget.surat.id, // penting agar update bukan insert
+            id: widget.surat.id,
             nomor: nomor.text,
             perihal: perihal.text,
             tanggal: widget.surat.tanggal,

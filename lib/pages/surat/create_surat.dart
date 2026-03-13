@@ -86,7 +86,7 @@ class _CreateSuratPageState extends State<CreateSuratPage> {
       Surat(
         nomor: nomor.text,
         perihal: perihal.text,
-        tanggal: selectedTanggal!, // sekarang pakai tanggal yang dipilih
+        tanggal: selectedTanggal!,
         asalTujuan: asal.text,
         kategori: kategori,
       ),

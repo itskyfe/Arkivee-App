@@ -21,7 +21,7 @@ class PageHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // tombol back kalau bisa balik
+              // tombol back
               if (Navigator.canPop(context))
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
